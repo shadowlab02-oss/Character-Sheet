@@ -49,6 +49,7 @@
       <label>Class: <input type="text" id="charClass"></label><br>
       <label>Hit Die: <input type="text" id="hitDie" placeholder="e.g. d8"></label><br>
       <label>Level: <input type="number" id="level" value="1" min="1"></label><br>
+      <label>Proficiency Bonus: <input type="number" id="profBonus" value="2" readonly></label><br>
       <label>HP: <input type="number" id="hp" value="8" min="1"></label><br>
       <label>Armor Class (AC): <input type="number" id="ac" value="10"></label><br>
       <button class="levelUpBtn" id="levelUp">Level Up</button>
@@ -188,6 +189,9 @@
 
       hpField.value = parseInt(hpField.value,10) + gain;
       levelField.value = parseInt(levelField.value,10) + 1;
+
+      updateProficiencyBonus();
+      
       alert(`You leveled up! Gained ${gain} HP (avg ${avgRoll} + CON mod).`);
     });
 
@@ -259,6 +263,112 @@
       spellContainer.appendChild(div);
     });
 
+function getModifier(score) {
+  return Math.floor((score - 10) / 2);
+}
+
+function updateProficiencyBonus() {
+  const level = parseInt(document.getElementById('level').value, 10);
+  let bonus = 2 + Math.floor((level - 1) / 4);
+  document.getElementById('profBonus').value = bonus;
+  return bonus;
+}
+
+function createProficiencyList(container, items, isSavingThrow = false) {
+  items.forEach(name => {
+    const div = document.createElement('div');
+    div.className = isSavingThrow ? 'saving-throw' : 'skill';
+
+    const icon = document.createElement('span');
+    icon.className = 'proficiency';
+    icon.textContent = '⚪';
+
+    const label = document.createElement('span');
+    label.textContent = name;
+
+    const modSpan = document.createElement('span');
+    modSpan.style.marginLeft = 'auto';
+    modSpan.textContent = '+0'; // initial modifier
+
+    // Click to toggle proficiency/expertise
+    icon.addEventListener('click', () => {
+      if (icon.textContent === '⚪') icon.textContent = '⭕';       // proficient
+      else if (icon.textContent === '⭕') icon.textContent = '🔵';  // expertise
+      else icon.textContent = '⚪';                                // none
+      updateAllModifiers();
+    });
+
+    div.appendChild(icon);
+    div.appendChild(label);
+    div.appendChild(modSpan);
+    container.appendChild(div);
+  });
+}
+
+
+function updateAllModifiers() {
+  const bonus = updateProficiencyBonus();
+
+  // Update stats
+  const statMods = {};
+  stats.forEach(stat => {
+    const val = parseInt(document.getElementById(stat).value,10);
+    statMods[stat] = getModifier(val);
+  });
+
+  // Update saving throws
+  const savingDiv = document.getElementById('savingThrows');
+  Array.from(savingDiv.children).forEach(div => {
+    const icon = div.querySelector('.proficiency');
+    const name = div.querySelector('span:nth-child(2)').textContent;
+    const modSpan = div.querySelector('span:nth-child(3)');
+    const statAbbrev = name.slice(0,3).toLowerCase(); // STR, DEX etc
+    let mod = statMods[statAbbrev] || 0;
+    if (icon.textContent === '⭕') mod += bonus;       // proficient
+    else if (icon.textContent === '🔵') mod += bonus*2; // expertise
+    modSpan.textContent = (mod>=0?'+':'') + mod;
+  });
+
+  // Update skills
+  const skillsDiv = document.getElementById('skills');
+  Array.from(skillsDiv.children).forEach(div => {
+    const icon = div.querySelector('.proficiency');
+    const name = div.querySelector('span:nth-child(2)').textContent;
+    const modSpan = div.querySelector('span:nth-child(3)');
+    const statMatch = name.match(/\((\w+)\)/);
+    const statAbbrev = statMatch ? statMatch[1].toLowerCase() : 'str';
+    let mod = statMods[statAbbrev] || 0;
+    if (icon.textContent === '⭕') mod += bonus;
+    else if (icon.textContent === '🔵') mod += bonus*2;
+    modSpan.textContent = (mod>=0?'+':'') + mod;
+  });
+}
+
+// Step 6: Add event listeners to update modifiers automatically
+
+// Update stats modifiers when the number inputs change
+stats.forEach(stat => {
+  const input = document.getElementById(stat);
+  input.addEventListener('input', updateAllModifiers);
+});
+
+// Update saving throw modifiers when proficiency icon is clicked
+document.querySelectorAll('#savingThrows .proficiency').forEach(icon => {
+  icon.addEventListener('click', updateAllModifiers);
+});
+
+// Update skill modifiers when proficiency icon is clicked
+document.querySelectorAll('#skills .proficiency').forEach(icon => {
+  icon.addEventListener('click', updateAllModifiers);
+});
+
+// Update modifiers when level changes (affects proficiency bonus)
+document.getElementById('level').addEventListener('input', () => {
+  updateProficiencyBonus();
+  updateAllModifiers();
+});
+
+
     // 🧠 Save / Load Character Data --------------------
 function saveCharacterData() {
   const charName = localStorage.getItem('currentCharacter');
@@ -304,3 +414,4 @@ loadCharacterData();
   </script>
 </body>
 </html>
+
