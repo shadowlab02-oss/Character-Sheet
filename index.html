@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>D&D Character Manager</title>
+  <style>
+    body { font-family: sans-serif; background: #fafafa; max-width: 800px; margin: auto; text-align: center; }
+    h1 { margin-top: 30px; }
+    .char-card {
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin: 10px auto;
+      padding: 10px;
+      width: 70%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .btn {
+      padding: 6px 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .create-btn { background: #4CAF50; color: white; margin: 10px 0; }
+    .delete-btn { background: #e74c3c; color: white; }
+  </style>
+</head>
+<body>
+
+  <h1>D&D 5e Character Manager</h1>
+  <button class="btn create-btn" id="newCharacter">➕ Create New Character</button>
+
+  <div id="charList"></div>
+
+  <script>
+    function loadCharacterList() {
+      const listDiv = document.getElementById('charList');
+      listDiv.innerHTML = '';
+      const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+
+      Object.keys(saved).forEach(name => {
+        const card = document.createElement('div');
+        card.className = 'char-card';
+        card.innerHTML = `
+          <strong>${name}</strong>
+          <div>
+            <button class="btn" onclick="openCharacter('${name}')">Open</button>
+            <button class="btn delete-btn" onclick="deleteCharacter('${name}')">Delete</button>
+          </div>
+        `;
+        listDiv.appendChild(card);
+      });
+
+      if (Object.keys(saved).length === 0)
+        listDiv.innerHTML = '<p>No characters saved yet.</p>';
+    }
+
+    function openCharacter(name) {
+      localStorage.setItem('currentCharacter', name);
+      window.location.href = 'sheet.html';
+    }
+
+    function deleteCharacter(name) {
+      if (!confirm(`Delete ${name}?`)) return;
+      const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+      delete saved[name];
+      localStorage.setItem('characters', JSON.stringify(saved));
+      loadCharacterList();
+    }
+
+    document.getElementById('newCharacter').addEventListener('click', () => {
+  const name = prompt('Enter character name:');
+  if (!name) return;
+  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+  if (saved[name]) return alert('That name already exists!');
+
+  // 🟢 Create a default character object with basic stats
+  saved[name] = {
+    name: name,
+    charClass: '',
+    hitDie: 'd8',
+    level: 1,
+    hp: 8,
+    ac: 10,
+    stats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+    features: [],
+    proficiencies: [],
+    homebrew: [],
+    spells: {} // this will hold spell lists by level
+  };
+
+  localStorage.setItem('characters', JSON.stringify(saved));
+  localStorage.setItem('currentCharacter', name);
+  window.location.href = 'sheet.html';
+});
+
+    loadCharacterList();
+  </script>
+
+</body>
+</html>

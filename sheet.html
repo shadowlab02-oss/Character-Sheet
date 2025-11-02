@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>D&D 5e Character Sheet</title>
+  <style>
+    body { font-family: sans-serif; max-width: 1000px; margin: auto; background: #fafafa; }
+    h1, h2 { text-align: center; }
+    input[type="text"], input[type="number"] { margin: 4px; padding: 3px; }
+    .stat { width: 50px; text-align: center; }
+    .block-list { background: #fff; padding: 8px; border: 1px solid #ccc; min-height: 50px; margin-bottom: 10px; }
+    .block-item { 
+      border: 1px solid #aaa; 
+      background: #eee; 
+      padding: 5px; 
+      margin: 3px 0; 
+      border-radius: 5px; 
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+    }
+    .remove-btn {
+      cursor: pointer;
+      font-weight: bold;
+      color: #900;
+      margin-left: 10px;
+    }
+    .remove-btn:hover { color: red; }
+    .proficiency { cursor: pointer; font-size: 18px; margin-right: 6px; }
+    .saving-throw, .skill { display: flex; align-items: center; margin: 2px 0; }
+    .stat-table { margin: 10px 0; }
+    .levelUpBtn { margin-top: 20px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .box { background: #fff; border: 1px solid #ccc; padding: 10px; border-radius: 6px; }
+    .spell-section { margin-top: 20px; }
+    .spell-level { margin-bottom: 10px; }
+    .spell-slot { margin: 0 5px; }
+  </style>
+</head>
+<body>
+
+  <h1>D&D 5e Character Sheet</h1>
+
+  <button onclick="window.location.href='index.html'">🏠 Back to Character List</button>
+
+  <div class="grid">
+    <div class="box">
+      <label>Name: <input type="text" id="name"></label><br>
+      <label>Class: <input type="text" id="charClass"></label><br>
+      <label>Hit Die: <input type="text" id="hitDie" placeholder="e.g. d8"></label><br>
+      <label>Level: <input type="number" id="level" value="1" min="1"></label><br>
+      <label>HP: <input type="number" id="hp" value="8" min="1"></label><br>
+      <label>Armor Class (AC): <input type="number" id="ac" value="10"></label><br>
+      <button class="levelUpBtn" id="levelUp">Level Up</button>
+    </div>
+
+    <div class="box">
+      <h3>Stats</h3>
+      <table class="stat-table">
+        <tr><td>STR</td><td><input class="stat" id="str" type="number" value="10"></td></tr>
+        <tr><td>DEX</td><td><input class="stat" id="dex" type="number" value="10"></td></tr>
+        <tr><td>CON</td><td><input class="stat" id="con" type="number" value="10"></td></tr>
+        <tr><td>INT</td><td><input class="stat" id="int" type="number" value="10"></td></tr>
+        <tr><td>WIS</td><td><input class="stat" id="wis" type="number" value="10"></td></tr>
+        <tr><td>CHA</td><td><input class="stat" id="cha" type="number" value="10"></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="box">
+      <h3>Saving Throws</h3>
+      <div id="savingThrows"></div>
+    </div>
+    <div class="box">
+      <h3>Skills</h3>
+      <div id="skills"></div>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="box">
+      <h3>Features & Traits</h3>
+      <input type="text" id="featureInput" placeholder="Type and press Enter...">
+      <div id="featureList" class="block-list"></div>
+    </div>
+    <div class="box">
+      <h3>Proficiencies</h3>
+      <input type="text" id="profInput" placeholder="Type and press Enter...">
+      <div id="profList" class="block-list"></div>
+    </div>
+  </div>
+
+  <div class="box">
+    <h3>Homebrew / Extras</h3>
+    <input type="text" id="homebrewInput" placeholder="Type and press Enter...">
+    <div id="homebrewList" class="block-list"></div>
+  </div>
+
+  <!-- 🆕 SPELL LIST SECTION -->
+  <div class="box spell-section">
+    <h3>Spell List</h3>
+    <div id="spellsContainer"></div>
+  </div>
+
+  <script>
+    const stats = ['str','dex','con','int','wis','cha'];
+    const savingThrows = ['Strength','Dexterity','Constitution','Intelligence','Wisdom','Charisma'];
+    const skills = [
+      'Acrobatics (Dex)','Animal Handling (Wis)','Arcana (Int)','Athletics (Str)','Deception (Cha)',
+      'History (Int)','Insight (Wis)','Intimidation (Cha)','Investigation (Int)','Medicine (Wis)',
+      'Nature (Int)','Perception (Wis)','Performance (Cha)','Persuasion (Cha)','Religion (Int)',
+      'Sleight of Hand (Dex)','Stealth (Dex)','Survival (Wis)'
+    ];
+
+    // 🆕 --- Proficiency Toggle (3-Phase) ---
+    function createProficiencyList(container, items) {
+      items.forEach(name => {
+        const div = document.createElement('div');
+        div.className = 'saving-throw';
+        const icon = document.createElement('span');
+        icon.className = 'proficiency';
+        icon.textContent = '⚪';
+        icon.addEventListener('click', () => {
+          if (icon.textContent === '⚪') icon.textContent = '⭕';       // proficient
+          else if (icon.textContent === '⭕') icon.textContent = '🔵';  // expertise
+          else icon.textContent = '⚪';                                // reset
+        });
+        const label = document.createElement('span');
+        label.textContent = name;
+        div.appendChild(icon);
+        div.appendChild(label);
+        container.appendChild(div);
+      });
+    }
+
+    createProficiencyList(document.getElementById('savingThrows'), savingThrows);
+    createProficiencyList(document.getElementById('skills'), skills);
+
+    // --- Editable Block List Setup ---
+    function setupList(inputId, listId) {
+      const input = document.getElementById(inputId);
+      const list = document.getElementById(listId);
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim() !== '') {
+          const div = document.createElement('div');
+          div.className = 'block-item';
+          const textSpan = document.createElement('span');
+          textSpan.textContent = input.value.trim();
+
+          // 🆕 Make text editable on double-click
+          textSpan.addEventListener('dblclick', () => {
+            const newText = prompt('Edit entry:', textSpan.textContent);
+            if (newText !== null) textSpan.textContent = newText.trim();
+          });
+
+          const removeBtn = document.createElement('span');
+          removeBtn.className = 'remove-btn';
+          removeBtn.textContent = '❌';
+          removeBtn.title = 'Remove';
+          removeBtn.addEventListener('click', () => div.remove());
+          div.appendChild(textSpan);
+          div.appendChild(removeBtn);
+          list.appendChild(div);
+          input.value = '';
+        }
+      });
+    }
+    setupList('homebrewInput','homebrewList');
+    setupList('featureInput','featureList');
+    setupList('profInput','profList');
+
+    // --- Level Up Logic ---
+    document.getElementById('levelUp').addEventListener('click', () => {
+      const levelField = document.getElementById('level');
+      const conVal = parseInt(document.getElementById('con').value,10);
+      const hpField = document.getElementById('hp');
+      const hitDie = document.getElementById('hitDie').value.trim();
+      if (!hitDie.match(/^d\d+$/)) {
+        alert('Please enter a valid hit die like d6, d8, d10, or d12.');
+        return;
+      }
+
+      const dieVal = parseInt(hitDie.slice(1));
+      const conMod = Math.floor((conVal - 10)/2);
+      const avgRoll = Math.ceil(dieVal / 2) + 1; // average HP gain
+      const gain = avgRoll + conMod;
+
+      hpField.value = parseInt(hpField.value,10) + gain;
+      levelField.value = parseInt(levelField.value,10) + 1;
+      alert(`You leveled up! Gained ${gain} HP (avg ${avgRoll} + CON mod).`);
+    });
+
+    // 🆕 SPELL LIST GENERATION
+    const spellContainer = document.getElementById('spellsContainer');
+    const spellLevels = ['Cantrips (0)', '1st Level', '2nd Level', '3rd Level', '4th Level', '5th Level', '6th Level', '7th Level', '8th Level', '9th Level'];
+
+    spellLevels.forEach((lvl, i) => {
+      const div = document.createElement('div');
+      div.className = 'spell-level';
+      const title = document.createElement('h4');
+      title.textContent = lvl;
+      const slots = document.createElement('div');
+      if (i > 0) {
+        const used = document.createElement('input');
+        used.type = 'number';
+        used.min = 0;
+        used.value = 0;
+        used.className = 'spell-slot';
+        const total = document.createElement('input');
+        total.type = 'number';
+        total.min = 0;
+        total.value = 0;
+        total.className = 'spell-slot';
+        const slotLabel = document.createElement('span');
+        slotLabel.textContent = 'Slots Used / Total: ';
+        slots.appendChild(slotLabel);
+        slots.appendChild(used);
+        slots.appendChild(document.createTextNode('/'));
+        slots.appendChild(total);
+      }
+
+      // Input and list for spells at this level
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = 'Type spell and press Enter...';
+      const list = document.createElement('div');
+      list.className = 'block-list';
+
+      // Reuse setupList for spells
+      input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && input.value.trim() !== '') {
+          const item = document.createElement('div');
+          item.className = 'block-item';
+          const textSpan = document.createElement('span');
+          textSpan.textContent = input.value.trim();
+
+          // editable spell name
+          textSpan.addEventListener('dblclick', () => {
+            const newText = prompt('Edit spell name:', textSpan.textContent);
+            if (newText !== null) textSpan.textContent = newText.trim();
+          });
+
+          const removeBtn = document.createElement('span');
+          removeBtn.textContent = '❌';
+          removeBtn.className = 'remove-btn';
+          removeBtn.addEventListener('click', () => item.remove());
+          item.appendChild(textSpan);
+          item.appendChild(removeBtn);
+          list.appendChild(item);
+          input.value = '';
+        }
+      });
+
+      div.appendChild(title);
+      if (i > 0) div.appendChild(slots);
+      div.appendChild(input);
+      div.appendChild(list);
+      spellContainer.appendChild(div);
+    });
+
+    // 🧠 Save / Load Character Data --------------------
+function saveCharacterData() {
+  const charName = localStorage.getItem('currentCharacter');
+  if (!charName) return;
+
+  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+  const data = {
+    name: document.getElementById('name').value,
+    charClass: document.getElementById('charClass').value,
+    hitDie: document.getElementById('hitDie').value,
+    level: document.getElementById('level').value,
+    hp: document.getElementById('hp').value,
+    ac: document.getElementById('ac').value,
+  };
+  saved[charName] = data;
+  localStorage.setItem('characters', JSON.stringify(saved));
+}
+
+function loadCharacterData() {
+  const charName = localStorage.getItem('currentCharacter');
+  if (!charName) {
+    alert('No character selected!');
+    window.location.href = 'index.html';
+    return;
+  }
+  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+  const data = saved[charName] || {};
+  document.getElementById('name').value = data.name || charName;
+  document.getElementById('charClass').value = data.charClass || '';
+  document.getElementById('hitDie').value = data.hitDie || 'd8';
+  document.getElementById('level').value = data.level || 1;
+  document.getElementById('hp').value = data.hp || 8;
+  document.getElementById('ac').value = data.ac || 10;
+}
+
+// autosave whenever an input changes
+document.querySelectorAll('input').forEach(el => {
+  el.addEventListener('change', saveCharacterData);
+});
+
+loadCharacterData();
+
+  </script>
+</body>
+</html>
