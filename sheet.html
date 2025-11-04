@@ -35,6 +35,62 @@
     .spell-section { margin-top: 20px; }
     .spell-level { margin-bottom: 10px; }
     .spell-slot { margin: 0 5px; }
+
+    .sheet-theme-default {
+  --bg: #ffffff;
+  --text: #000;
+  --border: #888;
+}
+
+.sheet-theme-dark {
+  --bg: #121212;
+  --text: #eee;
+  --border: #555;
+}
+
+.sheet-theme-forest {
+  --bg: #233d2c;
+  --text: #d9f5e0;
+  --border: #4caf50;
+}
+
+.sheet-theme-arcane {
+  --bg: #301a40;
+  --text: #f0e6ff;
+  --border: #b47fff;
+}
+
+.sheet-theme-elf {
+  --bg: #e3f9e5;
+  --text: #1b3b2f;
+  --border: #4caf50;
+  background-image: url('https://i.imgur.com/4KSt4dE.png'); /* vines/decor pattern */
+  background-size: cover;
+}
+
+.sheet-theme-dwarf {
+  --bg: #3b2f1b;
+  --text: #f0d090;
+  --border: #c49040;
+  background-image: url('https://i.imgur.com/kO8y7oE.png'); /* stone decor */
+  background-size: cover;
+}
+
+.sheet-theme-dragonborn {
+  --bg: #2a0000;
+  --text: #ffb3b3;
+  --border: #ff4500;
+  background-image: url('https://i.imgur.com/lB2m7Qm.png'); /* scales decor */
+  background-size: cover;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  border-color: var(--border);
+  transition: background-color 0.3s, color 0.3s;
+}
+
   </style>
 </head>
 <body>
@@ -42,6 +98,19 @@
   <h1>D&D 5e Character Sheet</h1>
 
   <button onclick="window.location.href='index.html'">🏠 Back to Character List</button>
+
+  <div class="sheet-theme-selector">
+  <label for="sheetTheme">Sheet Theme:</label>
+  <select id="sheetTheme">
+    <option value="default">Default</option>
+    <option value="dark">Dark</option>
+    <option value="forest">Forest</option>
+    <option value="arcane">Arcane</option>
+    <option value="elf">Elven Grace</option>
+    <option value="dwarf">Dwarven Forge</option>
+    <option value="dragonborn">Dragonborn Flame</option>
+  </select>
+</div>
 
   <div class="grid">
     <div class="box">
@@ -410,8 +479,24 @@ document.querySelectorAll('input').forEach(el => {
 });
 
 loadCharacterData();
-
+    
   </script>
+  <script>
+  const sheetThemeSelector = document.getElementById("sheetTheme");
+  const characterId = new URLSearchParams(window.location.search).get("id");
+  const savedSheetTheme = localStorage.getItem("theme-" + characterId) || "default";
+
+  document.body.classList.add("sheet-theme-" + savedSheetTheme);
+  sheetThemeSelector.value = savedSheetTheme;
+
+  sheetThemeSelector.addEventListener("change", (e) => {
+    document.body.className = "";
+    document.body.classList.add("sheet-theme-" + e.target.value);
+    localStorage.setItem("theme-" + characterId, e.target.value);
+  });
+</script>
+
 </body>
 </html>
+
 
