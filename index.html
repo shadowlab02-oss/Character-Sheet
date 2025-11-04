@@ -146,7 +146,20 @@ body {
 
     loadCharacterList();
   </script>
+<script>
+  const themeSelector = document.getElementById("theme");
+  const savedTheme = localStorage.getItem("mainTheme") || "light";
+  document.body.classList.add("theme-" + savedTheme);
+  themeSelector.value = savedTheme;
+
+  themeSelector.addEventListener("change", (e) => {
+    document.body.className = "";
+    document.body.classList.add("theme-" + e.target.value);
+    localStorage.setItem("mainTheme", e.target.value);
+  });
+</script>
 
 </body>
 </html>
+
 
