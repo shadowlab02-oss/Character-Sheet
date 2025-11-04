@@ -5,26 +5,41 @@
   <title>D&D 5e Character Sheet</title>
   <style>
     :root {
-  --bg-color: #fafafa;
-  --text-color: #000;
-  --box-bg: #fff;
-  --border-color: #ccc;
-}
-    body { font-family: sans-serif; max-width: 1000px; margin: auto; background: #fafafa; }
+      --bg-color: #fafafa;
+      --text-color: #000;
+      --box-bg: #fff;
+      --border-color: #ccc;
+      --box-pattern: none;
+      --page-pattern: none;
+    }
+
+    /* Base styles */
     body {
-  background: var(--bg-color);
-  color: var(--text-color);
-}
+      font-family: sans-serif;
+      max-width: 1000px;
+      margin: auto;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color 0.3s, color 0.3s;
+      background-image: var(--page-pattern);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
+
     h1, h2 { text-align: center; }
+
     input[type="text"], input[type="number"] { margin: 4px; padding: 3px; }
     .stat { width: 50px; text-align: center; }
+
     .block-list {
-  background: var(--box-bg);
-  border: 1px solid var(--border-color);
-  padding: 8px;
-  min-height: 50px;
-  margin-bottom: 10px;
-}
+      background: var(--box-bg);
+      border: 1px solid var(--border-color);
+      padding: 8px;
+      min-height: 50px;
+      margin-bottom: 10px;
+    }
+
     .block-item { 
       border: 1px solid #aaa; 
       background: #eee; 
@@ -35,6 +50,7 @@
       justify-content: space-between; 
       align-items: center;
     }
+
     .remove-btn {
       cursor: pointer;
       font-weight: bold;
@@ -42,201 +58,126 @@
       margin-left: 10px;
     }
     .remove-btn:hover { color: red; }
+
     .proficiency { cursor: pointer; font-size: 18px; margin-right: 6px; }
     .saving-throw, .skill { display: flex; align-items: center; margin: 2px 0; }
     .stat-table { margin: 10px 0; }
     .levelUpBtn { margin-top: 20px; }
     .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    
+
     .spell-section { margin-top: 20px; }
     .spell-level { margin-bottom: 10px; }
     .spell-slot { margin: 0 5px; }
+
+    /* Box styling */
     .box {
-  background: var(--box-bg);
-  border: 1px solid var(--border-color);
-  padding: 10px;
-  border-radius: 6px;
-}
-    /* --- THEME OVERRIDES --- */
-
-/* Default (already uses root variables) */
-
-/* Dark mode */
-.sheet-theme-dark {
-  --bg-color: #1e1e1e;
-  --text-color: #f0f0f0;
-  --box-bg: #2a2a2a;
-  --border-color: #555;
-}
-
-/* Forest theme */
-.sheet-theme-forest {
-  --bg-color: #e8f5e9;
-  --text-color: #1b5e20;
-  --box-bg: #c8e6c9;
-  --border-color: #388e3c;
-}
-
-/* Arcane theme */
-.sheet-theme-arcane {
-  --bg-color: #ede7f6;
-  --text-color: #4a148c;
-  --box-bg: #d1c4e9;
-  --border-color: #7e57c2;
-}
-
-/* Elven Grace theme */
-.sheet-theme-elf {
-  --bg-color: #f0fff4;
-  --text-color: #006400;
-  --box-bg: #c6f6d5;
-  --border-color: #68d391;
-}
-
-/* Dwarven Forge theme */
-.sheet-theme-dwarf {
-  --bg-color: #fdf6ec;
-  --text-color: #4b2e05;
-  --box-bg: #f5deb3;
-  --border-color: #a0522d;
-}
-
-/* Dragonborn Flame theme */
-.sheet-theme-dragonborn {
-  --bg-color: #fff5f5;
-  --text-color: #7f1d1d;
-  --box-bg: #fecaca;
-  --border-color: #991b1b;
-}
-
-    /* Page background per theme */
-body.sheet-theme-elf {
-  background-image: url('assets/elf-pattern.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-body.sheet-theme-dwarf {
-  background-image: url('assets/dwarf-forge.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-body.sheet-theme-dragonborn {
-  background-image: url('assets/dragon-scales.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-body.sheet-theme-arcane {
-  background-image: url('assets/arcane-runes.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-body.sheet-theme-forest {
-  background-image: url('assets/forest-leaves.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-
-    .sheet-theme-elf .box {
-  background-image: url('assets/elf-pattern.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.sheet-theme-dwarf .box {
-  background-image: url('assets/dwarf-forge.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.sheet-theme-dragonborn .box {
-  background-image: url('assets/dragon-scales.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.sheet-theme-arcane .box {
-  background-image: url('assets/arcane-runes.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-.sheet-theme-forest .box {
-  background-image: url('assets/forest-leaves.png');
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-}
-
-    
-
-.sheet-theme-elf::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url('assets/elf-border.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.25;
-  pointer-events: none;
-}
-
-.sheet-theme-dwarf::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url('assets/dwarf-border.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.sheet-theme-dragonborn::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  background: url('assets/dragonborn-border.png') no-repeat center;
-  background-size: contain;
-  opacity: 0.3;
-  pointer-events: none;
-}
+      background-color: var(--box-bg);
+      border: 1px solid var(--border-color);
+      padding: 10px;
+      border-radius: 6px;
+      position: relative;
+      background-image: var(--box-pattern);
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+    }
 
     .box::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.4); /* adjust opacity */
-  border-radius: 6px;
-  z-index: 0;
-}
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(255,255,255,0.2);
+      border-radius: 6px;
+      z-index: 0;
+    }
+    .box * { position: relative; z-index: 1; }
 
-.box * {
-  position: relative;
-  z-index: 1;
-}
+    /* --- THEME VARIABLES --- */
+    .sheet-theme-dark {
+      --bg-color: #1e1e1e;
+      --text-color: #f0f0f0;
+      --box-bg: #2a2a2a;
+      --border-color: #555;
+      --box-pattern: none;
+      --page-pattern: none;
+    }
 
+    .sheet-theme-forest {
+      --bg-color: #e8f5e9;
+      --text-color: #1b5e20;
+      --box-bg: #c8e6c9;
+      --border-color: #388e3c;
+      --box-pattern: url('assets/forest-leaves.png');
+      --page-pattern: url('assets/forest-leaves.png');
+    }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  border-color: var(--border-color);
-  transition: background-color 0.3s, color 0.3s;
-}
+    .sheet-theme-arcane {
+      --bg-color: #ede7f6;
+      --text-color: #4a148c;
+      --box-bg: #d1c4e9;
+      --border-color: #7e57c2;
+      --box-pattern: url('assets/arcane-runes.png');
+      --page-pattern: url('assets/arcane-runes.png');
+    }
 
+    .sheet-theme-elf {
+      --bg-color: #f0fff4;
+      --text-color: #006400;
+      --box-bg: #c6f6d5;
+      --border-color: #68d391;
+      --box-pattern: url('assets/elf-pattern.png');
+      --page-pattern: url('assets/elf-pattern.png');
+    }
+
+    .sheet-theme-dwarf {
+      --bg-color: #fdf6ec;
+      --text-color: #4b2e05;
+      --box-bg: #f5deb3;
+      --border-color: #a0522d;
+      --box-pattern: url('assets/dwarf-forge.png');
+      --page-pattern: url('assets/dwarf-forge.png');
+    }
+
+    .sheet-theme-dragonborn {
+      --bg-color: #fff5f5;
+      --text-color: #7f1d1d;
+      --box-bg: #fecaca;
+      --border-color: #991b1b;
+      --box-pattern: url('assets/dragon-scales.png');
+      --page-pattern: url('assets/dragon-scales.png');
+    }
+
+    /* Theme decorative borders */
+    .sheet-theme-elf::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url('assets/elf-border.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.25;
+      pointer-events: none;
+    }
+    .sheet-theme-dwarf::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url('assets/dwarf-border.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.3;
+      pointer-events: none;
+    }
+    .sheet-theme-dragonborn::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background: url('assets/dragonborn-border.png') no-repeat center;
+      background-size: contain;
+      opacity: 0.3;
+      pointer-events: none;
+    }
   </style>
 </head>
+
 <body>
 
   <h1>D&D 5e Character Sheet</h1>
@@ -625,42 +566,28 @@ document.querySelectorAll('input').forEach(el => {
 loadCharacterData();
     
   </script>
-  <script>
+  
+<script>
   const sheetThemeSelector = document.getElementById("sheetTheme");
-  const characterId = new URLSearchParams(window.location.search).get("id");
-  const savedSheetTheme = localStorage.getItem("theme-" + characterId) || "default";
+  const characterId = new URLSearchParams(window.location.search).get("id") || "default";
 
-  document.body.classList.add("sheet-theme-" + savedSheetTheme);
+  // Load saved theme for this character
+  const savedSheetTheme = localStorage.getItem("theme-" + characterId) || "default";
+  document.body.className = "sheet-theme-" + savedSheetTheme;
   sheetThemeSelector.value = savedSheetTheme;
 
+  // Change theme and save selection
   sheetThemeSelector.addEventListener("change", (e) => {
-    document.body.className = "";
-    document.body.classList.add("sheet-theme-" + e.target.value);
-    localStorage.setItem("theme-" + characterId, e.target.value);
-  });
-</script>
-
-  <script>
-  const characterId = new URLSearchParams(window.location.search).get("id") || "default";
-  const themeSelect = document.getElementById("themeSelect");
-
-  // Load saved theme when sheet opens
-  const savedTheme = localStorage.getItem(`theme-${characterId}`);
-  if (savedTheme) {
-    document.body.className = savedTheme;
-    themeSelect.value = savedTheme;
-  }
-
-  // When player changes theme
-  themeSelect.addEventListener("change", (e) => {
     const newTheme = e.target.value;
-    document.body.className = newTheme;
-    localStorage.setItem(`theme-${characterId}`, newTheme);
+    document.body.className = "sheet-theme-" + newTheme;
+    localStorage.setItem("theme-" + characterId, newTheme);
   });
 </script>
+
 
 </body>
 </html>
+
 
 
 
