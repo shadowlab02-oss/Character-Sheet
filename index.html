@@ -25,9 +25,57 @@
     }
     .create-btn { background: #4CAF50; color: white; margin: 10px 0; }
     .delete-btn { background: #e74c3c; color: white; }
+
+    :root {
+  --bg-color: #fdfdfd;
+  --text-color: #222;
+  --accent-color: #007bff;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.theme-light {
+  --bg-color: #fdfdfd;
+  --text-color: #222;
+  --accent-color: #007bff;
+}
+
+.theme-dark {
+  --bg-color: #1a1a1a;
+  --text-color: #e0e0e0;
+  --accent-color: #00bcd4;
+}
+
+.theme-forest {
+  --bg-color: #1b3b2f;
+  --text-color: #e7f4ed;
+  --accent-color: #4caf50;
+}
+
+.theme-arcane {
+  --bg-color: #2e004f;
+  --text-color: #dcd3ff;
+  --accent-color: #a020f0;
+}
+
   </style>
 </head>
 <body>
+
+  <div class="theme-selector">
+  <label for="theme">Theme:</label>
+  <select id="theme">
+    <option value="light">Light</option>
+    <option value="dark">Dark</option>
+    <option value="forest">Forest</option>
+    <option value="arcane">Arcane</option>
+  </select>
+</div>
+
 
   <h1>D&D 5e Character Manager</h1>
   <button class="btn create-btn" id="newCharacter">➕ Create New Character</button>
@@ -101,3 +149,4 @@
 
 </body>
 </html>
+
