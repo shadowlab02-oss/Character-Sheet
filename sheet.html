@@ -109,35 +109,79 @@
   --border-color: #991b1b;
 }
 
+    /* Page background per theme */
+body.sheet-theme-elf {
+  background-image: url('assets/elf-pattern.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+body.sheet-theme-dwarf {
+  background-image: url('assets/dwarf-forge.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+body.sheet-theme-dragonborn {
+  background-image: url('assets/dragon-scales.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+body.sheet-theme-arcane {
+  background-image: url('assets/arcane-runes.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+body.sheet-theme-forest {
+  background-image: url('assets/forest-leaves.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+
     .sheet-theme-elf .box {
   background-image: url('assets/elf-pattern.png');
   background-size: cover;
-  border-image: linear-gradient(#68d391, #2f855a) 1;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .sheet-theme-dwarf .box {
   background-image: url('assets/dwarf-forge.png');
   background-size: cover;
-  border-image: linear-gradient(#8b4513, #a0522d) 1;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .sheet-theme-dragonborn .box {
   background-image: url('assets/dragon-scales.png');
   background-size: cover;
-  border-image: linear-gradient(#ff7f7f, #8b0000) 1;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .sheet-theme-arcane .box {
   background-image: url('assets/arcane-runes.png');
   background-size: cover;
-  border-image: linear-gradient(#7e57c2, #4a148c) 1;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .sheet-theme-forest .box {
   background-image: url('assets/forest-leaves.png');
   background-size: cover;
-  border-image: linear-gradient(#2e7d32, #1b5e20) 1;
+  background-repeat: no-repeat;
+  background-position: center;
 }
+
+    
 
 .sheet-theme-elf::before {
   content: "";
@@ -167,6 +211,20 @@
   background-size: contain;
   opacity: 0.3;
   pointer-events: none;
+}
+
+    .box::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255,255,255,0.4); /* adjust opacity */
+  border-radius: 6px;
+  z-index: 0;
+}
+
+.box * {
+  position: relative;
+  z-index: 1;
 }
 
 
@@ -603,6 +661,7 @@ loadCharacterData();
 
 </body>
 </html>
+
 
 
 
