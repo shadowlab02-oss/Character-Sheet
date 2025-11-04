@@ -139,11 +139,41 @@
   border-image: linear-gradient(#2e7d32, #1b5e20) 1;
 }
 
+.sheet-theme-elf::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('assets/elf-border.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.25;
+  pointer-events: none;
+}
+
+.sheet-theme-dwarf::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('assets/dwarf-border.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.sheet-theme-dragonborn::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: url('assets/dragonborn-border.png') no-repeat center;
+  background-size: contain;
+  opacity: 0.3;
+  pointer-events: none;
+}
+
 
 body {
-  background-color: var(--bg);
-  color: var(--text);
-  border-color: var(--border);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border-color: var(--border-color);
   transition: background-color 0.3s, color 0.3s;
 }
 
@@ -552,8 +582,28 @@ loadCharacterData();
   });
 </script>
 
+  <script>
+  const characterId = new URLSearchParams(window.location.search).get("id") || "default";
+  const themeSelect = document.getElementById("themeSelect");
+
+  // Load saved theme when sheet opens
+  const savedTheme = localStorage.getItem(`theme-${characterId}`);
+  if (savedTheme) {
+    document.body.className = savedTheme;
+    themeSelect.value = savedTheme;
+  }
+
+  // When player changes theme
+  themeSelect.addEventListener("change", (e) => {
+    const newTheme = e.target.value;
+    document.body.className = newTheme;
+    localStorage.setItem(`theme-${characterId}`, newTheme);
+  });
+</script>
+
 </body>
 </html>
+
 
 
 
