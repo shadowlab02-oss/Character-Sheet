@@ -4,8 +4,24 @@
   <meta charset="utf-8">
   <title>D&D Character Manager</title>
   <style>
-    body { font-family: sans-serif; background: #fafafa; max-width: 800px; margin: auto; text-align: center; }
+    :root {
+      --bg-color: #fdfdfd;
+      --text-color: #222;
+      --accent-color: #007bff;
+    }
+
+    body {
+      font-family: sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      max-width: 800px;
+      margin: auto;
+      text-align: center;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
     h1 { margin-top: 30px; }
+
     .char-card {
       background: #fff;
       border: 1px solid #ccc;
@@ -17,6 +33,7 @@
       justify-content: space-between;
       align-items: center;
     }
+
     .btn {
       padding: 6px 10px;
       border: none;
@@ -26,56 +43,52 @@
     .create-btn { background: #4CAF50; color: white; margin: 10px 0; }
     .delete-btn { background: #e74c3c; color: white; }
 
-    :root {
-  --bg-color: #fdfdfd;
-  --text-color: #222;
-  --accent-color: #007bff;
-}
+    .theme-selector {
+      margin: 10px;
+      padding: 8px;
+      background: #fff;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      display: inline-block;
+    }
 
-body {
-  background-color: var(--bg-color);
-  color: var(--text-color);
-  transition: background-color 0.3s, color 0.3s;
-}
+    /* THEMES */
+    .theme-light {
+      --bg-color: #fdfdfd;
+      --text-color: #222;
+      --accent-color: #007bff;
+    }
 
-.theme-light {
-  --bg-color: #fdfdfd;
-  --text-color: #222;
-  --accent-color: #007bff;
-}
+    .theme-dark {
+      --bg-color: #1a1a1a;
+      --text-color: #dcdcdc;
+      --accent-color: #00bcd4;
+    }
 
-.theme-dark {
-  --bg-color: #1a1a1a;
-  --text-color: #808080;
-  --accent-color: #00bcd4;
-}
+    .theme-forest {
+      --bg-color: #1b3b2f;
+      --text-color: #d4edda;
+      --accent-color: #4caf50;
+    }
 
-.theme-forest {
-  --bg-color: #1b3b2f;
-  --text-color: #222;
-  --accent-color: #4caf50;
-}
-
-.theme-arcane {
-  --bg-color: #2e004f;
-  --text-color: #FF00FF;
-  --accent-color: #a020f0;
-}
-
+    .theme-arcane {
+      --bg-color: #2e004f;
+      --text-color: #f6e8ff;
+      --accent-color: #a020f0;
+    }
   </style>
 </head>
+
 <body>
-
   <div class="theme-selector">
-  <label for="theme">Theme:</label>
-  <select id="theme">
-    <option value="light">Light</option>
-    <option value="dark">Dark</option>
-    <option value="forest">Forest</option>
-    <option value="arcane">Arcane</option>
-  </select>
-</div>
-
+    <label for="theme">Theme:</label>
+    <select id="theme">
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+      <option value="forest">Forest</option>
+      <option value="arcane">Arcane</option>
+    </select>
+  </div>
 
   <h1>D&D 5e Character Manager</h1>
   <button class="btn create-btn" id="newCharacter">➕ Create New Character</button>
@@ -119,48 +132,48 @@ body {
     }
 
     document.getElementById('newCharacter').addEventListener('click', () => {
-  const name = prompt('Enter character name:');
-  if (!name) return;
-  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
-  if (saved[name]) return alert('That name already exists!');
+      const name = prompt('Enter character name:');
+      if (!name) return;
+      const saved = JSON.parse(localStorage.getItem('characters') || '{}');
+      if (saved[name]) return alert('That name already exists!');
 
-  // 🟢 Create a default character object with basic stats
-  saved[name] = {
-    name: name,
-    charClass: '',
-    hitDie: 'd8',
-    level: 1,
-    hp: 8,
-    ac: 10,
-    stats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
-    features: [],
-    proficiencies: [],
-    homebrew: [],
-    spells: {} // this will hold spell lists by level
-  };
+      saved[name] = {
+        name,
+        charClass: '',
+        hitDie: 'd8',
+        level: 1,
+        hp: 8,
+        ac: 10,
+        stats: { str: 10, dex: 10, con: 10, int: 10, wis: 10, cha: 10 },
+        features: [],
+        proficiencies: [],
+        homebrew: [],
+        spells: {}
+      };
 
-  localStorage.setItem('characters', JSON.stringify(saved));
-  localStorage.setItem('currentCharacter', name);
-  window.location.href = 'sheet.html';
-});
+      localStorage.setItem('characters', JSON.stringify(saved));
+      localStorage.setItem('currentCharacter', name);
+      window.location.href = 'sheet.html';
+    });
 
     loadCharacterList();
+
+    // THEME HANDLER
+    const themeSelector = document.getElementById("theme");
+    const savedTheme = localStorage.getItem("mainTheme") || "light";
+    document.body.classList.add("theme-" + savedTheme);
+    themeSelector.value = savedTheme;
+
+    themeSelector.addEventListener("change", (e) => {
+      document.body.className = "";
+      document.body.classList.add("theme-" + e.target.value);
+      localStorage.setItem("mainTheme", e.target.value);
+    });
   </script>
-<script>
-  const themeSelector = document.getElementById("theme");
-  const savedTheme = localStorage.getItem("mainTheme") || "light";
-  document.body.classList.add("theme-" + savedTheme);
-  themeSelector.value = savedTheme;
-
-  themeSelector.addEventListener("change", (e) => {
-    document.body.className = "";
-    document.body.classList.add("theme-" + e.target.value);
-    localStorage.setItem("mainTheme", e.target.value);
-  });
-</script>
-
 </body>
 </html>
+
+
 
 
 
