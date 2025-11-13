@@ -1,264 +1,173 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8">
-  <title>D&D 5e Character Sheet</title>
+  <meta charset="utf-8" />
+  <title>D&D 5e — Character Sheet</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    :root {
-      --bg-color: #fafafa;
-      --text-color: #000;
-      --box-bg: #fff;
-      --border-color: #ccc;
-      --box-pattern: none;
-      --page-pattern: none;
+    :root{
+      --bg-color:#fafafa; --text-color:#111; --box-bg:#fff; --border-color:#ddd;
+      --box-pattern:none; --page-pattern:none;
     }
 
-    /* Base styles */
-    body {
-      font-family: sans-serif;
-      max-width: 1000px;
-      margin: auto;
-      background-color: var(--bg-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s;
-      background-image: var(--page-pattern);
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
+    /* base */
+    html,body{ height:100%; margin:0; padding:12px; font-family:system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial; background-color:var(--bg-color); color:var(--text-color); transition:background-color .25s,color .25s; background-image:var(--page-pattern); background-size:cover; background-position:center; background-repeat:no-repeat;}
+    h1{ text-align:center; margin:8px 0 14px; }
+    .topbar{ display:flex; gap:8px; align-items:center; justify-content:space-between; margin-bottom:10px; }
+    .topbar .left{ display:flex; gap:8px; align-items:center; }
+    button.btn{ padding:8px 10px; border-radius:6px; border:0; cursor:pointer; background:#2196f3; color:white; }
+    button.btn.secondary{ background:#666; }
+    .grid{ display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-bottom:12px; }
+    .box{ background-color:var(--box-bg); border:1px solid var(--border-color); padding:10px; border-radius:8px; position:relative; background-image:var(--box-pattern); background-size:cover; background-position:center; background-repeat:no-repeat; overflow:hidden; min-height:40px;}
+    label{ display:block; margin:6px 0; font-size:0.95rem; }
+    input[type="text"], input[type="number"], select{ padding:6px; border-radius:6px; border:1px solid #ccc; width:100%; box-sizing:border-box; }
+    .stat{ width:58px; }
+    .stat-table td{ padding:4px 6px; }
+    .block-list{ background:rgba(255,255,255,0.85); border:1px solid #ccc; padding:8px; min-height:32px; border-radius:6px; }
+    .block-item{ display:flex; gap:8px; align-items:center; justify-content:space-between; padding:6px; background:#f0f0f0; border-radius:6px; margin:6px 0; border:1px solid #ddd; }
+    .remove-btn{ cursor:pointer; color:#900; font-weight:bold; margin-left:8px; }
+    .proficiency{ cursor:pointer; font-size:18px; margin-right:8px; user-select:none; }
+    .inline{ display:flex; gap:8px; align-items:center; }
+    .spell-level{ margin:8px 0; }
+    .spell-slot{ width:70px; }
+    .small{ width:auto; display:inline-block; padding:6px 8px; border-radius:6px; }
+    .sheet-theme-selector{ display:flex; gap:8px; align-items:center; }
+
+    /* box overlay for readability (slight) */
+    .box::after{ content:''; position:absolute; inset:0; background:rgba(255,255,255,0.15); pointer-events:none; border-radius:8px; }
+
+    /* theme variants using CSS variables */
+    .sheet-theme-default{ --bg-color:#fafafa; --text-color:#111; --box-bg:#fff; --border-color:#ddd; --box-pattern:none; --page-pattern:none; }
+    .sheet-theme-dark{ --bg-color:#1e1e1e; --text-color:#eaeaea; --box-bg:#272727; --border-color:#444; --box-pattern:none; --page-pattern:none; }
+    .sheet-theme-forest{ --bg-color:#e8f5e9; --text-color:#0b3d23; --box-bg:#dff0e1; --border-color:#79b887; --box-pattern:url('assets/forest-leaves.png'); --page-pattern:none; }
+    .sheet-theme-arcane{ --bg-color:#f3ecff; --text-color:#2c004d; --box-bg:#efe6ff; --border-color:#b994ff; --box-pattern:url('assets/arcane-runes.png'); --page-pattern:none; }
+    .sheet-theme-elf{ --bg-color:#f5fff7; --text-color:#044c2f; --box-bg:#e6fff1; --border-color:#8bd9a3; --box-pattern:url('assets/elf-pattern.png'); --page-pattern:none; }
+    .sheet-theme-dwarf{ --bg-color:#fff8f0; --text-color:#3a2b20; --box-bg:#fff1e0; --border-color:#b98253; --box-pattern:url('assets/dwarf-forge.png'); --page-pattern:none; }
+    .sheet-theme-dragonborn{ --bg-color:#fff7f7; --text-color:#4d0b0b; --box-bg:#ffecec; --border-color:#d16a6a; --box-pattern:url('assets/dragon-scales.png'); --page-pattern:none; }
+
+    /* responsive */
+    @media(max-width:900px){
+      .grid{ grid-template-columns: 1fr; }
     }
 
-    h1, h2 { text-align: center; }
-
-    input[type="text"], input[type="number"] { margin: 4px; padding: 3px; }
-    .stat { width: 50px; text-align: center; }
-
-    .block-list {
-      background: var(--box-bg);
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      min-height: 50px;
-      margin-bottom: 10px;
-    }
-
-    .block-item { 
-      border: 1px solid #aaa; 
-      background: #eee; 
-      padding: 5px; 
-      margin: 3px 0; 
-      border-radius: 5px; 
-      display: flex; 
-      justify-content: space-between; 
-      align-items: center;
-    }
-
-    .remove-btn {
-      cursor: pointer;
-      font-weight: bold;
-      color: #900;
-      margin-left: 10px;
-    }
-    .remove-btn:hover { color: red; }
-
-    .proficiency { cursor: pointer; font-size: 18px; margin-right: 6px; }
-    .saving-throw, .skill { display: flex; align-items: center; margin: 2px 0; }
-    .stat-table { margin: 10px 0; }
-    .levelUpBtn { margin-top: 20px; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-    .spell-section { margin-top: 20px; }
-    .spell-level { margin-bottom: 10px; }
-    .spell-slot { margin: 0 5px; }
-
-    /* Box styling */
-    .box {
-      background-color: var(--box-bg);
-      border: 1px solid var(--border-color);
-      padding: 10px;
-      border-radius: 6px;
-      position: relative;
-      background-image: var(--box-pattern);
-      background-size: cover;
-      background-repeat: no-repeat;
-      background-position: center;
-    }
-
-    .box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(255,255,255,0.2);
-      border-radius: 6px;
-      z-index: 0;
-    }
-    .box * { position: relative; z-index: 1; }
-
-    /* --- THEME VARIABLES --- */
-    .sheet-theme-dark {
-      --bg-color: #1e1e1e;
-      --text-color: #f0f0f0;
-      --box-bg: #2a2a2a;
-      --border-color: #555;
-      --box-pattern: none;
-      --page-pattern: none;
-    }
-
-    .sheet-theme-forest {
-      --bg-color: #e8f5e9;
-      --text-color: #000000;
-      --box-bg: #c8e6c9;
-      --border-color: #388e3c;
-      --box-pattern: url('assets/forest-leaves.png');
-      --page-pattern: url('assets/forest-leaves.png');
-    }
-
-    .sheet-theme-arcane {
-      --bg-color: #ede7f6;
-      --text-color: #800080;
-      --box-bg: #d1c4e9;
-      --border-color: #7e57c2;
-      --box-pattern: url('assets/arcane-runes.png');
-      --page-pattern: url('assets/arcane-runes.png');
-    }
-
-    .sheet-theme-elf {
-      --bg-color: #f0fff4;
-      --text-color: #006400;
-      --box-bg: #c6f6d5;
-      --border-color: #68d391;
-      --box-pattern: url('assets/elf-pattern.png');
-      --page-pattern: url('assets/elf-pattern.png');
-    }
-
-    .sheet-theme-dwarf {
-      --bg-color: #fdf6ec;
-      --text-color: #4b2e05;
-      --box-bg: #f5deb3;
-      --border-color: #a0522d;
-      --box-pattern: url('assets/dwarf-forge.png');
-      --page-pattern: url('assets/dwarf-forge.png');
-    }
-
-    .sheet-theme-dragonborn {
-      --bg-color: #fff5f5;
-      --text-color: #7f1d1d;
-      --box-bg: #fecaca;
-      --border-color: #991b1b;
-      --box-pattern: url('assets/dragon-scales.png');
-      --page-pattern: url('assets/dragon-scales.png');
-    }
-
-    /* Theme decorative borders */
-    .sheet-theme-elf::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('assets/elf-border.png') no-repeat center;
-      background-size: contain;
-      opacity: 0.25;
-      pointer-events: none;
-    }
-    .sheet-theme-dwarf::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('assets/dwarf-border.png') no-repeat center;
-      background-size: contain;
-      opacity: 0.3;
-      pointer-events: none;
-    }
-    .sheet-theme-dragonborn::before {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background: url('assets/dragonborn-border.png') no-repeat center;
-      background-size: contain;
-      opacity: 0.3;
-      pointer-events: none;
-    }
+    /* small helpers */
+    .right{ text-align:right; }
+    .muted{ color:#666; font-size:0.9rem; }
   </style>
 </head>
-
 <body>
+  <h1>D&D 5e — Character Sheet</h1>
 
-  <h1>D&D 5e Character Sheet</h1>
+  <div class="topbar">
+    <div class="left">
+      <button class="btn" onclick="goHome()">🏠 Back</button>
+      <div style="margin-left:8px;">
+        <button class="btn secondary" id="downloadBtn">⬇️ Download (Print to PDF)</button>
+      </div>
+    </div>
 
-  <button onclick="window.location.href='index.html'">🏠 Back to Character List</button>
+    <div class="sheet-theme-selector">
+      <label for="sheetTheme">Sheet Theme:</label>
+      <select id="sheetTheme" class="small">
+        <option value="default">Default</option>
+        <option value="dark">Dark</option>
+        <option value="forest">Forest</option>
+        <option value="arcane">Arcane</option>
+        <option value="elf">Elven Grace</option>
+        <option value="dwarf">Dwarven Forge</option>
+        <option value="dragonborn">Dragonborn Flame</option>
+      </select>
+    </div>
+  </div>
 
-  <div class="sheet-theme-selector">
-  <label for="sheetTheme">Sheet Theme:</label>
-  <select id="sheetTheme">
-    <option value="default">Default</option>
-    <option value="dark">Dark</option>
-    <option value="forest">Forest</option>
-    <option value="arcane">Arcane</option>
-    <option value="elf">Elven Grace</option>
-    <option value="dwarf">Dwarven Forge</option>
-    <option value="dragonborn">Dragonborn Flame</option>
-  </select>
-</div>
-
+  <!-- Basic info + stats -->
   <div class="grid">
     <div class="box">
-      <label>Name: <input type="text" id="name"></label><br>
-      <label>Class: <input type="text" id="charClass"></label><br>
-      <label>Hit Die: <input type="text" id="hitDie" placeholder="e.g. d8"></label><br>
-      <label>Level: <input type="number" id="level" value="1" min="1"></label><br>
-      <label>Proficiency Bonus: <input type="number" id="profBonus" value="2" readonly></label><br>
-      <label>HP: <input type="number" id="hp" value="8" min="1"></label><br>
-      <label>Armor Class (AC): <input type="number" id="ac" value="10"></label><br>
-      <button class="levelUpBtn" id="levelUp">Level Up</button>
+      <label>Name: <input type="text" id="name" placeholder="Character name"></label>
+      <label>Class: <input type="text" id="charClass" placeholder="Class"></label>
+      <label>Hit Die: <input type="text" id="hitDie" placeholder="e.g. d8"></label>
+      <label>Level: <input type="number" id="level" min="1" value="1"></label>
+      <label>Proficiency Bonus: <input type="number" id="profBonus" readonly></label>
+      <label>HP: <input type="number" id="hp" min="0" value="8"></label>
+      <label>Armor Class (AC): <input type="number" id="ac" value="10"></label>
+      <div style="margin-top:8px;">
+        <button class="btn small" id="levelUp">Level Up</button>
+      </div>
     </div>
 
     <div class="box">
       <h3>Stats</h3>
       <table class="stat-table">
-        <tr><td>STR</td><td><input class="stat" id="str" type="number" value="10"></td></tr>
-        <tr><td>DEX</td><td><input class="stat" id="dex" type="number" value="10"></td></tr>
-        <tr><td>CON</td><td><input class="stat" id="con" type="number" value="10"></td></tr>
-        <tr><td>INT</td><td><input class="stat" id="int" type="number" value="10"></td></tr>
-        <tr><td>WIS</td><td><input class="stat" id="wis" type="number" value="10"></td></tr>
-        <tr><td>CHA</td><td><input class="stat" id="cha" type="number" value="10"></td></tr>
+        <tr><td>STR</td><td><input class="stat" id="str" type="number" value="10"></td><td>DEX</td><td><input class="stat" id="dex" type="number" value="10"></td></tr>
+        <tr><td>CON</td><td><input class="stat" id="con" type="number" value="10"></td><td>INT</td><td><input class="stat" id="int" type="number" value="10"></td></tr>
+        <tr><td>WIS</td><td><input class="stat" id="wis" type="number" value="10"></td><td>CHA</td><td><input class="stat" id="cha" type="number" value="10"></td></tr>
       </table>
     </div>
   </div>
 
+  <!-- Saving throws & skills -->
   <div class="grid">
     <div class="box">
       <h3>Saving Throws</h3>
       <div id="savingThrows"></div>
+      <div class="muted">Click the circle to toggle: None → Proficient → Expertise</div>
     </div>
+
     <div class="box">
       <h3>Skills</h3>
       <div id="skills"></div>
+      <div class="muted">Click the circle to toggle: None → Proficient → Expertise</div>
     </div>
   </div>
 
+  <!-- features/proficiencies and homebrew -->
   <div class="grid">
     <div class="box">
       <h3>Features & Traits</h3>
-      <input type="text" id="featureInput" placeholder="Type and press Enter...">
+      <input id="featureInput" type="text" placeholder="Type and press Enter...">
       <div id="featureList" class="block-list"></div>
     </div>
+
     <div class="box">
       <h3>Proficiencies</h3>
-      <input type="text" id="profInput" placeholder="Type and press Enter...">
+      <input id="profInput" type="text" placeholder="Type and press Enter...">
       <div id="profList" class="block-list"></div>
     </div>
   </div>
 
   <div class="box">
     <h3>Homebrew / Extras</h3>
-    <input type="text" id="homebrewInput" placeholder="Type and press Enter...">
+    <input id="homebrewInput" type="text" placeholder="Type and press Enter...">
     <div id="homebrewList" class="block-list"></div>
   </div>
 
-  <!-- 🆕 SPELL LIST SECTION -->
+  <!-- Spells -->
   <div class="box spell-section">
-    <h3>Spell List</h3>
+    <h3>Spell List & Slots</h3>
     <div id="spellsContainer"></div>
   </div>
 
   <script>
+    // ---------- Utilities ----------
+    function qs(sel){ return document.querySelector(sel); }
+    function qsa(sel){ return Array.from(document.querySelectorAll(sel)); }
+    function byId(id){ return document.getElementById(id); }
+
+    function goHome(){ window.location.href = 'index.html'; }
+
+    // Get character id from URL (fallback to localStorage currentCharacter)
+    const urlId = new URLSearchParams(window.location.search).get('id');
+    const currentCharacter = urlId || localStorage.getItem('currentCharacter') || localStorage.getItem('lastCreated') || null;
+    if(!currentCharacter){
+      alert('No character selected. Returning to manager.');
+      goHome();
+    }
+
+    // ----- Data helpers -----
+    function loadSavedCharacters(){ return JSON.parse(localStorage.getItem('characters') || '{}'); }
+    function saveAllCharacters(obj){ localStorage.setItem('characters', JSON.stringify(obj)); }
+
+    // ---------- Sheet fields & constants ----------
     const stats = ['str','dex','con','int','wis','cha'];
     const savingThrows = ['Strength','Dexterity','Constitution','Intelligence','Wisdom','Charisma'];
     const skills = [
@@ -268,324 +177,399 @@
       'Sleight of Hand (Dex)','Stealth (Dex)','Survival (Wis)'
     ];
 
-    //stuff goes here
+    // ---------- Create proficiency UI (saving throws & skills) ----------
+    function createProficiencyList(container, items, isSaving){
+      container.innerHTML = '';
+      items.forEach(name=>{
+        const div = document.createElement('div');
+        div.className = isSaving ? 'saving-throw' : 'skill';
+        const icon = document.createElement('span');
+        icon.className = 'proficiency';
+        icon.textContent = '⚪'; // none
+        icon.title = 'Click: toggle None → Proficient → Expertise';
+        icon.addEventListener('click', ()=>{
+          if(icon.textContent === '⚪') icon.textContent = '⭕';
+          else if(icon.textContent === '⭕') icon.textContent = '🔵';
+          else icon.textContent = '⚪';
+          updateAllModifiers();
+          saveCharacterData();
+        });
+        const label = document.createElement('span');
+        label.textContent = name;
+        const modSpan = document.createElement('span');
+        modSpan.style.marginLeft = 'auto';
+        modSpan.textContent = '+0';
+        div.appendChild(icon);
+        div.appendChild(label);
+        div.appendChild(modSpan);
+        container.appendChild(div);
+      });
+    }
 
-    createProficiencyList(document.getElementById('savingThrows'), savingThrows);
-    createProficiencyList(document.getElementById('skills'), skills);
+    createProficiencyList(byId('savingThrows'), savingThrows, true);
+    createProficiencyList(byId('skills'), skills, false);
 
-    // --- Editable Block List Setup ---
-    function setupList(inputId, listId) {
-      const input = document.getElementById(inputId);
-      const list = document.getElementById(listId);
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && input.value.trim() !== '') {
-          const div = document.createElement('div');
-          div.className = 'block-item';
-          const textSpan = document.createElement('span');
-          textSpan.textContent = input.value.trim();
-
-          // 🆕 Make text editable on double-click
-          textSpan.addEventListener('dblclick', () => {
-            const newText = prompt('Edit entry:', textSpan.textContent);
-            if (newText !== null) textSpan.textContent = newText.trim();
-          });
-
-          const removeBtn = document.createElement('span');
-          removeBtn.className = 'remove-btn';
-          removeBtn.textContent = '❌';
-          removeBtn.title = 'Remove';
-          removeBtn.addEventListener('click', () => div.remove());
-          div.appendChild(textSpan);
-          div.appendChild(removeBtn);
-          list.appendChild(div);
+    // ---------- Editable block lists (features, profs, homebrew) ----------
+    function setupList(inputId, listId, keyInData){
+      const input = byId(inputId), list = byId(listId);
+      input.addEventListener('keydown', (e)=>{
+        if(e.key === 'Enter' && input.value.trim() !== ''){
+          const value = input.value.trim();
+          appendBlockItem(list, value);
           input.value = '';
+          saveCharacterData();
         }
       });
     }
-    setupList('homebrewInput','homebrewList');
-    setupList('featureInput','featureList');
-    setupList('profInput','profList');
 
-    // --- Level Up Logic ---
-    document.getElementById('levelUp').addEventListener('click', () => {
-      const levelField = document.getElementById('level');
-      const conVal = parseInt(document.getElementById('con').value,10);
-      const hpField = document.getElementById('hp');
-      const hitDie = document.getElementById('hitDie').value.trim();
-      if (!hitDie.match(/^d\d+$/)) {
-        alert('Please enter a valid hit die like d6, d8, d10, or d12.');
-        return;
-      }
+    function appendBlockItem(list, text){
+      const item = document.createElement('div');
+      item.className = 'block-item';
+      const span = document.createElement('span');
+      span.textContent = text;
+      span.addEventListener('dblclick', ()=>{
+        const newText = prompt('Edit entry:', span.textContent);
+        if(newText!==null){ span.textContent = newText.trim(); saveCharacterData(); }
+      });
+      const rem = document.createElement('span');
+      rem.className = 'remove-btn';
+      rem.textContent = '❌';
+      rem.title = 'Remove';
+      rem.addEventListener('click', ()=>{ item.remove(); saveCharacterData(); });
+      item.appendChild(span);
+      item.appendChild(rem);
+      list.appendChild(item);
+    }
 
-      const dieVal = parseInt(hitDie.slice(1));
-      const conMod = Math.floor((conVal - 10)/2);
-      const avgRoll = Math.ceil(dieVal / 2) + 1; // average HP gain
-      const gain = avgRoll + conMod;
+    setupList('featureInput','featureList','features');
+    setupList('profInput','profList','proficiencies');
+    setupList('homebrewInput','homebrewList','homebrew');
 
-      hpField.value = parseInt(hpField.value,10) + gain;
-      levelField.value = parseInt(levelField.value,10) + 1;
+    // ---------- Spell list generation ----------
+    const spellContainer = byId('spellsContainer');
+    const spellLevels = ['Cantrips (0)','1st Level','2nd Level','3rd Level','4th Level','5th Level','6th Level','7th Level','8th Level','9th Level'];
 
-      updateProficiencyBonus();
-      
-      alert(`You leveled up! Gained ${gain} HP (avg ${avgRoll} + CON mod).`);
-    });
+    const spellLevelElements = {}; // store references
+    function createSpellSections(){
+      spellContainer.innerHTML = '';
+      spellLevels.forEach((lvl,i)=>{
+        const div = document.createElement('div');
+        div.className = 'spell-level box';
+        const title = document.createElement('h4');
+        title.style.marginTop = 0;
+        title.textContent = lvl;
+        div.appendChild(title);
 
-    // 🆕 SPELL LIST GENERATION
-    const spellContainer = document.getElementById('spellsContainer');
-    const spellLevels = ['Cantrips (0)', '1st Level', '2nd Level', '3rd Level', '4th Level', '5th Level', '6th Level', '7th Level', '8th Level', '9th Level'];
-
-    spellLevels.forEach((lvl, i) => {
-      const div = document.createElement('div');
-      div.className = 'spell-level';
-      const title = document.createElement('h4');
-      title.textContent = lvl;
-      const slots = document.createElement('div');
-      if (i > 0) {
-        const used = document.createElement('input');
-        used.type = 'number';
-        used.min = 0;
-        used.value = 0;
-        used.className = 'spell-slot';
-        const total = document.createElement('input');
-        total.type = 'number';
-        total.min = 0;
-        total.value = 0;
-        total.className = 'spell-slot';
-        const slotLabel = document.createElement('span');
-        slotLabel.textContent = 'Slots Used / Total: ';
-        slots.appendChild(slotLabel);
-        slots.appendChild(used);
-        slots.appendChild(document.createTextNode('/'));
-        slots.appendChild(total);
-      }
-
-      // Input and list for spells at this level
-      const input = document.createElement('input');
-      input.type = 'text';
-      input.placeholder = 'Type spell and press Enter...';
-      const list = document.createElement('div');
-      list.className = 'block-list';
-
-      // Reuse setupList for spells
-      input.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && input.value.trim() !== '') {
-          const item = document.createElement('div');
-          item.className = 'block-item';
-          const textSpan = document.createElement('span');
-          textSpan.textContent = input.value.trim();
-
-          // editable spell name
-          textSpan.addEventListener('dblclick', () => {
-            const newText = prompt('Edit spell name:', textSpan.textContent);
-            if (newText !== null) textSpan.textContent = newText.trim();
-          });
-
-          const removeBtn = document.createElement('span');
-          removeBtn.textContent = '❌';
-          removeBtn.className = 'remove-btn';
-          removeBtn.addEventListener('click', () => item.remove());
-          item.appendChild(textSpan);
-          item.appendChild(removeBtn);
-          list.appendChild(item);
-          input.value = '';
+        const controls = document.createElement('div');
+        controls.className = 'inline';
+        // only levels > 0 have slots
+        if(i>0){
+          const used = document.createElement('input');
+          used.type='number'; used.min=0; used.value=0; used.className='spell-slot';
+          const total = document.createElement('input');
+          total.type='number'; total.min=0; total.value=0; total.className='spell-slot';
+          used.title='Slots used'; total.title='Total slots';
+          used.addEventListener('change', saveCharacterData);
+          total.addEventListener('change', saveCharacterData);
+          controls.appendChild(document.createTextNode('Slots Used / Total: '));
+          controls.appendChild(used);
+          controls.appendChild(document.createTextNode('/'));
+          controls.appendChild(total);
+          spellLevelElements[i] = {used,total};
         }
+        div.appendChild(controls);
+
+        const input = document.createElement('input');
+        input.type='text'; input.placeholder='Type spell name and press Enter...';
+        const list = document.createElement('div'); list.className='block-list';
+        input.addEventListener('keydown',(e)=>{
+          if(e.key==='Enter' && input.value.trim()!==''){
+            const nm = input.value.trim();
+            const item = document.createElement('div'); item.className='block-item';
+            const t = document.createElement('span'); t.textContent = nm;
+            t.addEventListener('dblclick', ()=>{
+              const newText = prompt('Edit spell name:', t.textContent);
+              if(newText!==null){ t.textContent = newText.trim(); saveCharacterData(); }
+            });
+            const rem = document.createElement('span'); rem.className='remove-btn'; rem.textContent='❌';
+            rem.addEventListener('click', ()=>{ item.remove(); saveCharacterData(); });
+            item.appendChild(t); item.appendChild(rem);
+            list.appendChild(item);
+            input.value='';
+            saveCharacterData();
+          }
+        });
+        div.appendChild(input); div.appendChild(list);
+        spellContainer.appendChild(div);
+        // store refs so load can populate
+        spellLevelElements[i] = spellLevelElements[i] || {};
+        spellLevelElements[i].list = list;
+      });
+    }
+    createSpellSections();
+
+    // ---------- Modifiers & proficiency bonus ----------
+    function getModifier(score){
+      return Math.floor((score - 10)/2);
+    }
+
+    function updateProficiencyBonus(){
+      const lvl = parseInt(byId('level').value,10) || 1;
+      const bonus = 2 + Math.floor((lvl - 1) / 4);
+      byId('profBonus').value = bonus;
+      return bonus;
+    }
+
+    function updateAllModifiers(){
+      const bonus = updateProficiencyBonus();
+      // stat mods
+      const statMods = {};
+      stats.forEach(s=>{
+        statMods[s] = getModifier(parseInt(byId(s).value,10) || 10);
       });
 
-      div.appendChild(title);
-      if (i > 0) div.appendChild(slots);
-      div.appendChild(input);
-      div.appendChild(list);
-      spellContainer.appendChild(div);
+      // saving throws
+      qsa('#savingThrows .saving-throw').forEach(div=>{
+        const icon = div.querySelector('.proficiency');
+        const label = div.querySelector('span:nth-child(2)').textContent;
+        const modSpan = div.querySelector('span:nth-child(3)');
+        const statAbbrev = label.slice(0,3).toLowerCase();
+        let mod = statMods[statAbbrev] || 0;
+        if(icon.textContent==='⭕') mod += bonus;
+        else if(icon.textContent==='🔵') mod += bonus*2;
+        modSpan.textContent = (mod>=0?'+':'') + mod;
+      });
+
+      // skills
+      qsa('#skills .skill').forEach(div=>{
+        const icon = div.querySelector('.proficiency');
+        const label = div.querySelector('span:nth-child(2)').textContent;
+        const modSpan = div.querySelector('span:nth-child(3)');
+        const m = label.match(/\((\w+)\)/);
+        const statAbbrev = m ? m[1].toLowerCase() : 'str';
+        let mod = statMods[statAbbrev] || 0;
+        if(icon.textContent==='⭕') mod += bonus;
+        else if(icon.textContent==='🔵') mod += bonus*2;
+        modSpan.textContent = (mod>=0?'+':'') + mod;
+      });
+    }
+
+    // update when inputs change
+    stats.forEach(s=>{
+      const el = byId(s);
+      el.addEventListener('input', ()=>{ updateAllModifiers(); saveCharacterData(); });
     });
+    byId('level').addEventListener('input', ()=>{ updateAllModifiers(); saveCharacterData(); });
 
-
-
-
-function getModifier(score) {
-  return Math.floor((score - 10) / 2);
-}
-
-function updateProficiencyBonus() {
-  const level = parseInt(document.getElementById('level').value, 10);
-  const bonus = 2 + Math.floor((level - 1) / 4);
-  document.getElementById('profBonus').value = bonus;
-  return bonus;
-}
-
-function createProficiencyList(container, items, isSavingThrow = false) {
-  items.forEach(name => {
-    const div = document.createElement('div');
-    div.className = isSavingThrow ? 'saving-throw' : 'skill';
-
-    const icon = document.createElement('span');
-    icon.className = 'proficiency';
-    icon.textContent = '⚪';
-
-    const label = document.createElement('span');
-    label.textContent = name;
-
-    const modSpan = document.createElement('span');
-    modSpan.style.marginLeft = 'auto';
-    modSpan.textContent = '+0';
-
-    icon.addEventListener('click', () => {
-      if (icon.textContent === '⚪') icon.textContent = '⭕';
-      else if (icon.textContent === '⭕') icon.textContent = '🔵';
-      else icon.textContent = '⚪';
+    // ---------- Level up logic (HP gain from hit die) ----------
+    byId('levelUp').addEventListener('click', ()=>{
+      const levelField = byId('level');
+      const conVal = parseInt(byId('con').value,10) || 10;
+      const hpField = byId('hp');
+      const hitDie = (byId('hitDie').value || '').trim();
+      if(!hitDie.match(/^d\d+$/)){
+        alert('Please enter a hit die like d6, d8, d10, or d12 (e.g. d8).');
+        return;
+      }
+      const dieVal = parseInt(hitDie.slice(1),10);
+      const conMod = Math.floor((conVal - 10)/2);
+      const avgRoll = Math.ceil(dieVal/2) + 1; // approximate
+      const gain = Math.max(1, avgRoll + conMod);
+      hpField.value = (parseInt(hpField.value,10) || 0) + gain;
+      levelField.value = (parseInt(levelField.value,10) || 1) + 1;
       updateAllModifiers();
+      saveCharacterData();
+      alert(`Leveled up! HP +${gain} (avg ${avgRoll} + CON mod ${conMod}).`);
     });
 
-    div.appendChild(icon);
-    div.appendChild(label);
-    div.appendChild(modSpan);
-    container.appendChild(div);
-  });
-}
+    // ---------- Save / Load character ----------
+    function saveCharacterData(){
+      const name = currentCharacter;
+      if(!name) return;
+      const all = loadSavedCharacters();
+      // collect primary fields
+      const data = {
+        name: byId('name').value,
+        charClass: byId('charClass').value,
+        hitDie: byId('hitDie').value,
+        level: parseInt(byId('level').value,10) || 1,
+        hp: parseInt(byId('hp').value,10) || 0,
+        ac: parseInt(byId('ac').value,10) || 10,
+        stats: {},
+        features: [],
+        proficiencies: [],
+        homebrew: [],
+        spells:{},
+        spellSlots:{},
+        savingProfs:{},
+        skillProfs:{},
+        theme: currentTheme()
+      };
+      // stats
+      stats.forEach(s => data.stats[s] = parseInt(byId(s).value,10) || 10);
+      // features / profs / homebrew
+      qsa('#featureList .block-item span:first-child').forEach(el=> data.features.push(el.textContent));
+      qsa('#profList .block-item span:first-child').forEach(el=> data.proficiencies.push(el.textContent));
+      qsa('#homebrewList .block-item span:first-child').forEach(el=> data.homebrew.push(el.textContent));
+      // spells & slots
+      spellLevels.forEach((lvl,i)=>{
+        // spells list
+        const listEl = spellLevelElements[i] && spellLevelElements[i].list;
+        if(listEl){
+          const spells = qsaIn(listEl, '.block-item span:first-child').map(x=>x.textContent);
+          if(spells.length) data.spells[i] = spells;
+        }
+        // slots
+        if(spellLevelElements[i] && spellLevelElements[i].used !== undefined){
+          data.spellSlots[i] = {
+            used: parseInt(spellLevelElements[i].used.value,10) || 0,
+            total: parseInt(spellLevelElements[i].total.value,10) || 0
+          };
+        }
+      });
+      // saving & skill profs
+      qsa('#savingThrows .saving-throw').forEach(div=>{
+        const name = div.querySelector('span:nth-child(2)').textContent;
+        const state = div.querySelector('.proficiency').textContent;
+        data.savingProfs[name] = state; // ⚪, ⭕, 🔵
+      });
+      qsa('#skills .skill').forEach(div=>{
+        const name = div.querySelector('span:nth-child(2)').textContent;
+        const state = div.querySelector('.proficiency').textContent;
+        data.skillProfs[name] = state;
+      });
 
-function updateAllModifiers() {
-  const bonus = updateProficiencyBonus();
-  const statMods = {};
-  stats.forEach(stat => {
-    statMods[stat] = getModifier(parseInt(document.getElementById(stat).value, 10));
-  });
+      all[name] = data;
+      saveAllCharacters(all);
+    }
 
-  document.querySelectorAll('#savingThrows .saving-throw').forEach(div => {
-    const [icon, label, modSpan] = div.children;
-    const statKey = label.textContent.slice(0, 3).toLowerCase();
-    let mod = statMods[statKey] || 0;
-    if (icon.textContent === '⭕') mod += bonus;
-    else if (icon.textContent === '🔵') mod += bonus * 2;
-    modSpan.textContent = (mod >= 0 ? '+' : '') + mod;
-  });
+    function qsaIn(parent, sel){ return Array.from(parent.querySelectorAll(sel)); }
 
-  document.querySelectorAll('#skills .skill').forEach(div => {
-    const [icon, label, modSpan] = div.children;
-    const statMatch = label.textContent.match(/\((\w+)\)/);
-    const statKey = statMatch ? statMatch[1].toLowerCase() : 'str';
-    let mod = statMods[statKey] || 0;
-    if (icon.textContent === '⭕') mod += bonus;
-    else if (icon.textContent === '🔵') mod += bonus * 2;
-    modSpan.textContent = (mod >= 0 ? '+' : '') + mod;
-  });
-}
+    function loadCharacterData(){
+      const name = currentCharacter;
+      const all = loadSavedCharacters();
+      const data = all[name] || {};
+      // primary fields
+      byId('name').value = data.name || name;
+      byId('charClass').value = data.charClass || '';
+      byId('hitDie').value = data.hitDie || 'd8';
+      byId('level').value = data.level || 1;
+      byId('hp').value = data.hp || 8;
+      byId('ac').value = data.ac || 10;
+      // stats
+      stats.forEach(s => byId(s).value = (data.stats && data.stats[s]) || 10 );
+      // features/profs/homebrew
+      const fillList = (arr, listEl) => {
+        listEl.innerHTML = '';
+        (arr||[]).forEach(text => appendBlockItem(listEl, text));
+      };
+      fillList(data.features, byId('featureList'));
+      fillList(data.proficiencies, byId('profList'));
+      fillList(data.homebrew, byId('homebrewList'));
+      // spells & slots
+      spellLevels.forEach((lvl,i)=>{
+        // clear list
+        const list = spellLevelElements[i] && spellLevelElements[i].list;
+        if(list) list.innerHTML = '';
+        if(data.spells && data.spells[i]){
+          (data.spells[i]||[]).forEach(sp => {
+            const item = document.createElement('div'); item.className='block-item';
+            const span = document.createElement('span'); span.textContent = sp;
+            const rem = document.createElement('span'); rem.className='remove-btn'; rem.textContent='❌';
+            rem.addEventListener('click', ()=>{ item.remove(); saveCharacterData(); });
+            span.addEventListener('dblclick', ()=>{ const ns = prompt('Edit spell name:', span.textContent); if(ns!==null){ span.textContent=ns; saveCharacterData(); } });
+            item.appendChild(span); item.appendChild(rem);
+            if(list) list.appendChild(item);
+          });
+        }
+        if(spellLevelElements[i] && data.spellSlots && data.spellSlots[i]){
+          spellLevelElements[i].used.value = data.spellSlots[i].used || 0;
+          spellLevelElements[i].total.value = data.spellSlots[i].total || 0;
+        } else if(spellLevelElements[i] && spellLevelElements[i].used !== undefined){
+          // defaults
+          spellLevelElements[i].used.value = spellLevelElements[i].used.value || 0;
+          spellLevelElements[i].total.value = spellLevelElements[i].total.value || 0;
+        }
+      });
+      // saving & skill profs
+      qsa('#savingThrows .saving-throw').forEach(div=>{
+        const name = div.querySelector('span:nth-child(2)').textContent;
+        const icon = div.querySelector('.proficiency');
+        const state = (data.savingProfs && data.savingProfs[name]) || '⚪';
+        icon.textContent = state;
+      });
+      qsa('#skills .skill').forEach(div=>{
+        const name = div.querySelector('span:nth-child(2)').textContent;
+        const icon = div.querySelector('.proficiency');
+        const state = (data.skillProfs && data.skillProfs[name]) || '⚪';
+        icon.textContent = state;
+      });
+      // theme
+      const theme = (data.theme) || (localStorage.getItem('theme-'+name) || 'default');
+      applyTheme(theme);
+      updateAllModifiers();
+    }
 
+    // bind saving on all inputs
+    function bindAutoSave(){
+      qsa('input[type="text"], input[type="number"]').forEach(el=>{
+        el.addEventListener('change', ()=> saveCharacterData());
+      });
+    }
+    bindAutoSave();
 
-  // Update saving throws
-  const savingDiv = document.getElementById('savingThrows');
-  Array.from(savingDiv.children).forEach(div => {
-    const icon = div.querySelector('.proficiency');
-    const name = div.querySelector('span:nth-child(2)').textContent;
-    const modSpan = div.querySelector('span:nth-child(3)');
-    const statAbbrev = name.slice(0,3).toLowerCase(); // STR, DEX etc
-    let mod = statMods[statAbbrev] || 0;
-    if (icon.textContent === '⭕') mod += bonus;       // proficient
-    else if (icon.textContent === '🔵') mod += bonus*2; // expertise
-    modSpan.textContent = (mod>=0?'+':'') + mod;
-  });
+    // ---------- Theme handling ----------
+    const sheetThemeSelector = byId('sheetTheme');
+    function applyTheme(t){
+      // reset classes that begin with sheet-theme-
+      document.body.className = Array.from(document.body.classList).filter(c => !c.startsWith('sheet-theme-')).join(' ');
+      document.body.classList.add('sheet-theme-'+t);
+      sheetThemeSelector.value = t;
+    }
+    function currentTheme(){ return sheetThemeSelector.value || 'default'; }
 
-  // Update skills
-  const skillsDiv = document.getElementById('skills');
-  Array.from(skillsDiv.children).forEach(div => {
-    const icon = div.querySelector('.proficiency');
-    const name = div.querySelector('span:nth-child(2)').textContent;
-    const modSpan = div.querySelector('span:nth-child(3)');
-    const statMatch = name.match(/\((\w+)\)/);
-    const statAbbrev = statMatch ? statMatch[1].toLowerCase() : 'str';
-    let mod = statMods[statAbbrev] || 0;
-    if (icon.textContent === '⭕') mod += bonus;
-    else if (icon.textContent === '🔵') mod += bonus*2;
-    modSpan.textContent = (mod>=0?'+':'') + mod;
-  });
-}
+    // load saved per-character theme
+    const savedTheme = localStorage.getItem('theme-'+currentCharacter) || 'default';
+    applyTheme(savedTheme);
 
-// Step 6: Add event listeners to update modifiers automatically
+    sheetThemeSelector.addEventListener('change', (e)=>{
+      const t = e.target.value;
+      applyTheme(t);
+      // save into character record
+      const all = loadSavedCharacters();
+      if(all[currentCharacter]) all[currentCharacter].theme = t;
+      localStorage.setItem('theme-'+currentCharacter, t);
+      saveAllCharacters(all);
+    });
 
-// Update stats modifiers when the number inputs change
-stats.forEach(stat => {
-  const input = document.getElementById(stat);
-  input.addEventListener('input', updateAllModifiers);
-});
+    // ---------- Download / Print (PDF) ----------
+    byId('downloadBtn').addEventListener('click', ()=>{
+      // Save before print
+      saveCharacterData();
+      // open print dialog (user may choose "Save as PDF")
+      window.print();
+    });
 
-// Update saving throw modifiers when proficiency icon is clicked
-document.querySelectorAll('#savingThrows .proficiency').forEach(icon => {
-  icon.addEventListener('click', updateAllModifiers);
-});
+    // ---------- Small helpers for query inside element ----------
+    // already have qsaIn
 
-// Update skill modifiers when proficiency icon is clicked
-document.querySelectorAll('#skills .proficiency').forEach(icon => {
-  icon.addEventListener('click', updateAllModifiers);
-});
+    // ---------- Startup: load sheet + attach other listeners ----------
+    loadCharacterData();
+    updateAllModifiers();
 
-// Update modifiers when level changes (affects proficiency bonus)
-document.getElementById('level').addEventListener('input', () => {
-  updateProficiencyBonus();
-  updateAllModifiers();
-});
+    // make sure dynamic proficiency icons update modifiers when clicked (already added), but attach also for future
+    // ensure autosave on removing blocks is handled by append/remove event listeners above
 
+    // helper to query block items in list
+    function qsa(selector){ return Array.from(document.querySelectorAll(selector)); }
+    function byId(id){ return document.getElementById(id); }
 
-    // 🧠 Save / Load Character Data --------------------
-function saveCharacterData() {
-  const charName = localStorage.getItem('currentCharacter');
-  if (!charName) return;
-
-  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
-  const data = {
-    name: document.getElementById('name').value,
-    charClass: document.getElementById('charClass').value,
-    hitDie: document.getElementById('hitDie').value,
-    level: document.getElementById('level').value,
-    hp: document.getElementById('hp').value,
-    ac: document.getElementById('ac').value,
-  };
-  saved[charName] = data;
-  localStorage.setItem('characters', JSON.stringify(saved));
-}
-
-function loadCharacterData() {
-  const charName = localStorage.getItem('currentCharacter');
-  if (!charName) {
-    alert('No character selected!');
-    window.location.href = 'index.html';
-    return;
-  }
-  const saved = JSON.parse(localStorage.getItem('characters') || '{}');
-  const data = saved[charName] || {};
-  document.getElementById('name').value = data.name || charName;
-  document.getElementById('charClass').value = data.charClass || '';
-  document.getElementById('hitDie').value = data.hitDie || 'd8';
-  document.getElementById('level').value = data.level || 1;
-  document.getElementById('hp').value = data.hp || 8;
-  document.getElementById('ac').value = data.ac || 10;
-}
-
-// autosave whenever an input changes
-document.querySelectorAll('input').forEach(el => {
-  el.addEventListener('change', saveCharacterData);
-});
-
-loadCharacterData();
-updateAllModifiers();
+    // safe: reload all values when page unloads
+    window.addEventListener('beforeunload', ()=> saveCharacterData() );
   </script>
-
-  <script>
-  const sheetThemeSelector = document.getElementById("sheetTheme");
-  const characterId = new URLSearchParams(window.location.search).get("id") || "default";
-
-  // Load saved theme
-  const savedSheetTheme = localStorage.getItem("theme-" + characterId) || "default";
-  document.body.className = "sheet-theme-" + savedSheetTheme;
-  sheetThemeSelector.value = savedSheetTheme;
-
-  // Change theme and save
-  sheetThemeSelector.addEventListener("change", (e) => {
-    const newTheme = e.target.value;
-    document.body.className = "sheet-theme-" + newTheme;
-    localStorage.setItem("theme-" + characterId, newTheme);
-  });
-</script>
-
 </body>
 </html>
+
 
 
 
