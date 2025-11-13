@@ -268,26 +268,7 @@
       'Sleight of Hand (Dex)','Stealth (Dex)','Survival (Wis)'
     ];
 
-    // 🆕 --- Proficiency Toggle (3-Phase) ---
-    function createProficiencyList(container, items) {
-      items.forEach(name => {
-        const div = document.createElement('div');
-        div.className = 'saving-throw';
-        const icon = document.createElement('span');
-        icon.className = 'proficiency';
-        icon.textContent = '⚪';
-        icon.addEventListener('click', () => {
-          if (icon.textContent === '⚪') icon.textContent = '⭕';       // proficient
-          else if (icon.textContent === '⭕') icon.textContent = '🔵';  // expertise
-          else icon.textContent = '⚪';                                // reset
-        });
-        const label = document.createElement('span');
-        label.textContent = name;
-        div.appendChild(icon);
-        div.appendChild(label);
-        container.appendChild(div);
-      });
-    }
+    //stuff goes here
 
     createProficiencyList(document.getElementById('savingThrows'), savingThrows);
     createProficiencyList(document.getElementById('skills'), skills);
@@ -417,13 +398,16 @@
       spellContainer.appendChild(div);
     });
 
+
+
+
 function getModifier(score) {
   return Math.floor((score - 10) / 2);
 }
 
 function updateProficiencyBonus() {
   const level = parseInt(document.getElementById('level').value, 10);
-  let bonus = 2 + Math.floor((level - 1) / 4);
+  const bonus = 2 + Math.floor((level - 1) / 4);
   document.getElementById('profBonus').value = bonus;
   return bonus;
 }
@@ -442,13 +426,12 @@ function createProficiencyList(container, items, isSavingThrow = false) {
 
     const modSpan = document.createElement('span');
     modSpan.style.marginLeft = 'auto';
-    modSpan.textContent = '+0'; // initial modifier
+    modSpan.textContent = '+0';
 
-    // Click to toggle proficiency/expertise
     icon.addEventListener('click', () => {
-      if (icon.textContent === '⚪') icon.textContent = '⭕';       // proficient
-      else if (icon.textContent === '⭕') icon.textContent = '🔵';  // expertise
-      else icon.textContent = '⚪';                                // none
+      if (icon.textContent === '⚪') icon.textContent = '⭕';
+      else if (icon.textContent === '⭕') icon.textContent = '🔵';
+      else icon.textContent = '⚪';
       updateAllModifiers();
     });
 
@@ -459,16 +442,33 @@ function createProficiencyList(container, items, isSavingThrow = false) {
   });
 }
 
-
 function updateAllModifiers() {
   const bonus = updateProficiencyBonus();
-
-  // Update stats
   const statMods = {};
   stats.forEach(stat => {
-    const val = parseInt(document.getElementById(stat).value,10);
-    statMods[stat] = getModifier(val);
+    statMods[stat] = getModifier(parseInt(document.getElementById(stat).value, 10));
   });
+
+  document.querySelectorAll('#savingThrows .saving-throw').forEach(div => {
+    const [icon, label, modSpan] = div.children;
+    const statKey = label.textContent.slice(0, 3).toLowerCase();
+    let mod = statMods[statKey] || 0;
+    if (icon.textContent === '⭕') mod += bonus;
+    else if (icon.textContent === '🔵') mod += bonus * 2;
+    modSpan.textContent = (mod >= 0 ? '+' : '') + mod;
+  });
+
+  document.querySelectorAll('#skills .skill').forEach(div => {
+    const [icon, label, modSpan] = div.children;
+    const statMatch = label.textContent.match(/\((\w+)\)/);
+    const statKey = statMatch ? statMatch[1].toLowerCase() : 'str';
+    let mod = statMods[statKey] || 0;
+    if (icon.textContent === '⭕') mod += bonus;
+    else if (icon.textContent === '🔵') mod += bonus * 2;
+    modSpan.textContent = (mod >= 0 ? '+' : '') + mod;
+  });
+}
+
 
   // Update saving throws
   const savingDiv = document.getElementById('savingThrows');
@@ -564,19 +564,19 @@ document.querySelectorAll('input').forEach(el => {
 });
 
 loadCharacterData();
-    
+updateAllModifiers();
   </script>
-  
-<script>
+
+  <script>
   const sheetThemeSelector = document.getElementById("sheetTheme");
   const characterId = new URLSearchParams(window.location.search).get("id") || "default";
 
-  // Load saved theme for this character
+  // Load saved theme
   const savedSheetTheme = localStorage.getItem("theme-" + characterId) || "default";
   document.body.className = "sheet-theme-" + savedSheetTheme;
   sheetThemeSelector.value = savedSheetTheme;
 
-  // Change theme and save selection
+  // Change theme and save
   sheetThemeSelector.addEventListener("change", (e) => {
     const newTheme = e.target.value;
     document.body.className = "sheet-theme-" + newTheme;
@@ -584,9 +584,9 @@ loadCharacterData();
   });
 </script>
 
-
 </body>
 </html>
+
 
 
 
